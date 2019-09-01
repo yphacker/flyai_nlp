@@ -1,0 +1,45 @@
+---
+name: Quora Duplicated Qusetions
+author: yphacker
+description: Quora Duplicated Qusetions
+topic: Quora Duplicated Qusetions
+algorithm: BERT
+language: python3
+virtualenv: flyai_env/bin/
+
+framework: tensorflow
+
+data:
+  id: DuplicatedQusetions
+  name: 检测两个问题是否重复
+  category: nlp
+
+
+model:
+  processor: Processor
+  input_x: input_x
+  input_y: input_y
+  output_y: output_y
+  input:
+    columns:
+      - name: question1
+        type: str
+      - name: question2
+        type: str
+    to_type: float
+    to_shape: [-1, 2]
+  output:
+    columns:
+      - name: labels
+        type: int
+    to_type: int
+    to_shape: [-1,1]
+
+
+evaluate:
+  score: tensorflow_accuracy
+
+servers:
+ - id: flyai
+   url: https://flyai.com
+...
