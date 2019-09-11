@@ -30,6 +30,6 @@ class Processor(Base):
     '''
 
     def output_y(self, data):
-        # 评估的时候需要将预测的ID值转换成对应的音素
+        # 评估的时候需要将预测的ID值转换成对应的答案
         result = id2ans(data[0], self.ans_dict)
         return result

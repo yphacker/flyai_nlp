@@ -8,7 +8,6 @@ import config
 from bert import modeling
 
 
-
 class BertModel(object):
     def __init__(self):
         path = remote_helper.get_remote_date("https://www.flyai.com/m/uncased_L-24_H-1024_A-16.zip")

@@ -1,4 +1,0 @@
-flyai
-numpy
-Pillow
-tensorflow

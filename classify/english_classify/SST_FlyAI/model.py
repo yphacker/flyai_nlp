@@ -2,14 +2,9 @@
 import numpy
 import os
 import tensorflow as tf
+from tensorflow.python.saved_model import tag_constants
 from flyai.model.base import Base
-from path import MODEL_PATH
-try:
-    from tensorflow.python.saved_model import tag_constants
-except:
-    from tensorflow.saved_model import tag_constants
-
-
+import config
 
 TENSORFLOW_MODEL_DIR = "best"
 
@@ -17,6 +12,7 @@ TENSORFLOW_MODEL_DIR = "best"
 class Model(Base):
     def __init__(self, data):
         self.data = data
+        self.model_path = os.path.join(config.MODEL_PATH, TENSORFLOW_MODEL_DIR)
 
     def predict(self, **data):
         '''
@@ -27,30 +23,28 @@ class Model(Base):
         :return:
         '''
         with tf.Session() as session:
-            tf.saved_model.loader.load(session, [tag_constants.SERVING], os.path.join(MODEL_PATH, TENSORFLOW_MODEL_DIR))
+            tf.saved_model.loader.load(session, [tag_constants.SERVING], self.model_path)
             input_ids = session.graph.get_tensor_by_name(self.get_tensor_name('input_ids'))
             input_mask = session.graph.get_tensor_by_name(self.get_tensor_name('input_masks'))
             segment_ids = session.graph.get_tensor_by_name(self.get_tensor_name('segment_ids'))
-            learning_rate = session.graph.get_tensor_by_name(self.get_tensor_name('learning_rate'))
             pred = session.graph.get_tensor_by_name(self.get_tensor_name('predict/pred'))
             x_input_ids, x_input_mask, x_segment_ids = self.data.predict_data(**data)
-            predict = session.run(pred, feed_dict={input_ids: x_input_ids, input_mask: x_input_mask,
-                                                   segment_ids: x_segment_ids, learning_rate: 0.0006})
+            feed_dict = {input_ids: x_input_ids, input_mask: x_input_mask, segment_ids: x_segment_ids}
+            predict = session.run(pred, feed_dict=feed_dict)
             return self.data.to_categorys(predict)
 
     def predict_all(self, datas):
         with tf.Session() as session:
-            tf.saved_model.loader.load(session, [tag_constants.SERVING], os.path.join(MODEL_PATH, TENSORFLOW_MODEL_DIR))
+            tf.saved_model.loader.load(session, [tag_constants.SERVING], self.model_path)
             input_ids = session.graph.get_tensor_by_name(self.get_tensor_name('input_ids'))
             input_mask = session.graph.get_tensor_by_name(self.get_tensor_name('input_masks'))
             segment_ids = session.graph.get_tensor_by_name(self.get_tensor_name('segment_ids'))
-            learning_rate = session.graph.get_tensor_by_name(self.get_tensor_name('learning_rate'))
             pred = session.graph.get_tensor_by_name(self.get_tensor_name('predict/pred'))
             ratings = []
             for data in datas:
                 x_input_ids, x_input_mask, x_segment_ids = self.data.predict_data(**data)
-                predict = session.run(pred, feed_dict={input_ids: x_input_ids, input_mask: x_input_mask,
-                                                       segment_ids: x_segment_ids, learning_rate: 0.0006})
+                feed_dict = {input_ids: x_input_ids, input_mask: x_input_mask, segment_ids: x_segment_ids}
+                predict = session.run(pred, feed_dict=feed_dict)
                 predict = self.data.to_categorys(predict)
                 ratings.append(predict)
         return ratings

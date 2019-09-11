@@ -328,7 +328,7 @@ def convert_single_example_simple(max_seq_length,
         # 因为要为句子补上[CLS], [SEP], [SEP]
         _truncate_seq_pair(tokens_a, tokens_b, max_seq_length - 3)
     else:
-        # 如果只有一个句子，只用在前后加上[CLS], [SEP] 所以句子长度要小于 max_seq_length - 3
+        # 如果只有一个句子，只用在前后加上[CLS], [SEP] 所以句子长度要小于 max_seq_length - 2
         if len(tokens_a) > max_seq_length - 2:
             tokens_a = tokens_a[0:(max_seq_length - 2)]
 

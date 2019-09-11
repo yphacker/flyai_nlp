@@ -78,10 +78,11 @@ class BertModel(object):
             per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
             self.loss = tf.reduce_mean(per_example_loss)
             # # 优化器
-            # self.train_op = tf.train.AdamOptimizer(learning_rate=model_config.learning_rate).minimize(self.loss)
+            # self.train_op = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(self.loss)
 
         with tf.name_scope('optimize'):
-            optimizer = tf.train.AdamOptimizer(self.learning_rate)
+            optimizer = tf.train.GradientDescentOptimizer(self.learning_rate)
+            # optimizer = tf.train.AdamOptimizer(self.learning_rate)
             gradients, variables = zip(*optimizer.compute_gradients(self.loss))
             gradients, _ = tf.clip_by_global_norm(gradients, config.grad_clip)
             self.train_op = optimizer.apply_gradients(zip(gradients, variables), global_step=self.global_step)

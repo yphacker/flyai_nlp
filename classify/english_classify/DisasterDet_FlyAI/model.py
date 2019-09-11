@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*
 import os
 import tensorflow as tf
+from tensorflow.python.saved_model import tag_constants
 from flyai.model.base import Base
-from path import MODEL_PATH
+import config
 
-try:
-    from tensorflow.python.saved_model import tag_constants
-except:
-    from tensorflow.saved_model import tag_constants
 
 TENSORFLOW_MODEL_DIR = "best"
 
@@ -15,7 +12,7 @@ TENSORFLOW_MODEL_DIR = "best"
 class Model(Base):
     def __init__(self, data):
         self.data = data
-        self.model_path = os.path.join(MODEL_PATH, TENSORFLOW_MODEL_DIR)
+        self.model_path = os.path.join(config.MODEL_PATH, TENSORFLOW_MODEL_DIR)
 
     def predict(self, **data):
         '''

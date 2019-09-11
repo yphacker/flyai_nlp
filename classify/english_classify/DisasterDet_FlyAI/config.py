@@ -13,9 +13,9 @@ LOG_PATH = os.path.join(sys.path[0], 'data', 'output', 'logs')
 # bert路径
 BERT_PATH = os.path.join(sys.path[0], 'bert', )
 
-max_seq_length = 45
+max_seq_length = 35
 num_labels = 2
-learning_rate = 5e-5
+learning_rate = 1e-5
 grad_clip = 5.0
 
 print_per_batch = 10

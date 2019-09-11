@@ -1,14 +1,16 @@
 ---
-# 把样例项目中的配置文件复制过来替换即可
 # 项目的名字
-name: 中文垃圾短信识别
+name: 美国点评网站Yelp评价预测
 # 项目的作者
-author: Honay
+author: yphacker
 # 项目的描述
-description: 阅读短信，确认是否是垃圾短信
-# 项目使用的网络
-algorithm: CNN
+description: 美国点评网站Yelp评价预测
+# 项目的主题
+topic: 美国点评网站Yelp评价预测
+# 项目使用的网络j
+algorithm: SRNN
 language: python3
+virtualenv: flyai_env/bin/
 # 项目使用的框架
 framework: tensorflow
 
@@ -17,8 +19,8 @@ data:
   # 数据集id
   # 该id为上传数据生成的id
   # 通过该id下载可以对应的数据集
-  id: SpamMessage
-  name: 中文垃圾短信识别
+  id: Yelp
+  name: 美国点评网站Yelp公开内部数据集
   category: nlp
 
 # 数据模型
@@ -42,21 +44,22 @@ model:
       - name: text
         type: string
     # 最终转换的数据类型
-    to_type: int
-    # 最终转换的数据维度
-    to_shape:
+    to_type: float
+    # 最终转换的数据纬度
+    to_shape: [8,8]
   # 模型用到的输入y字段
   # 在processor.py的input_y方法中体现
   output:
     columns:
-      - name: label
-        type: int
+      - name: stars
+        type: float
     # 最终转换的数据类型
-    to_type: int
-    # 最终转换的数据维度
-    to_shape:
+    to_type: float
+    # 最终转换的数据纬度
+    to_shape: [-1,5]
 
 # 使用离线训练的服务器
 servers:
- - id: flyai
-   url: https://www.flyai.com
+  - id: flyai
+    url: https://flyai.com
+...

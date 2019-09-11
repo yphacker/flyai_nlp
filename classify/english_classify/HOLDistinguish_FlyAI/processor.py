@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*
 
 import os
+import re
 from flyai.processor.base import Base
 import bert.tokenization as tokenization
 from bert.run_classifier import convert_single_example_simple
 import config
+import html
+from string import punctuation
 
 
 # class Processor(Base):
@@ -54,6 +57,17 @@ class Processor(Base):
             self.token = tokenization.FullTokenizer(vocab_file=bert_vocab_file)
         # pattern = "[!]+"
         # text = re.sub(pattern, '', text)
+        text = html.unescape(text)
+
+        # pattern = re.compile(r'[0-9]|[%s]+' % punctuation)
+        # tmp = re.sub(pattern, '', text)
+        # tmp = tmp.split(' ')
+        # new_tmp = []
+        # for word in tmp:
+        #     if word != '':
+        #         new_tmp.append(word)
+        # text = ' '.join(new_tmp)
+
         word_ids, word_mask, word_segment_ids = \
             convert_single_example_simple(max_seq_length=config.max_seq_length, tokenizer=self.token, text_a=text)
 

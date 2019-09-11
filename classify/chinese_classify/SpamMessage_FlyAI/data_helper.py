@@ -3,7 +3,7 @@
 import os
 import json
 import jieba
-from path import DATA_PATH
+import config
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -18,7 +18,7 @@ def data_process(text_str):
 
 def load_dict():
     char_dict_re = dict()
-    dict_path = os.path.join(DATA_PATH, 'words.dict')
+    dict_path = os.path.join(config.DATA_PATH, 'words.dict')
     with open(dict_path, encoding='utf-8') as fin:
         char_dict = json.load(fin)
     for k, v in char_dict.items():
@@ -47,5 +47,4 @@ def word2id(text_str, word_dict, max_seq_len=128):
 
 
 if __name__ == "__main__":
-
     exit(0)

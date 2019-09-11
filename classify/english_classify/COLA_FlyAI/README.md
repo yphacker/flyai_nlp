@@ -1,3 +1,3 @@
 # COLA_FlyAI
 
-socre:83.48
+socre:84.84

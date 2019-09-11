@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-import numpy as np
-
-max_seq_len = 200
-input_size = 1
 
 
 class Transformation:

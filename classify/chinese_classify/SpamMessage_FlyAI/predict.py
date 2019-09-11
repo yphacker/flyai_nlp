@@ -7,5 +7,5 @@ dataset = Dataset()
 # 模型操作辅助类
 model = Model(dataset)
 
-result = model.predict(text="you'r a good boy!")
+result = model.predict(text="全体裁判和工作人员都用热烈的掌声祝贺我们胜利归来")
 print(result)

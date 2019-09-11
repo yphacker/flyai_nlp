@@ -59,7 +59,6 @@ class BertModel(object):
             if self.is_training is True:
                 # I.e., 0.1 dropout
                 output_layer = tf.nn.dropout(output_layer, keep_prob=0.5)
-            # logits = tf.matmul(output_layer, output_weights)
             logits = tf.matmul(output_layer, output_weights)
             logits = tf.nn.bias_add(logits, output_bias)
             # probabilities = tf.nn.softmax(logits, axis=-1)

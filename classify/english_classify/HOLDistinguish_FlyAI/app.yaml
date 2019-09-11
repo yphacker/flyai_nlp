@@ -3,7 +3,7 @@
 # 项目的名字
 name: 仇恨言论识别
 # 项目的作者
-author: Honay
+author: yphacker
 # 项目的描述
 description: 查看短文，并确定它是否包含仇恨言论
 # 项目使用的网络
@@ -58,5 +58,5 @@ model:
 
 # 使用离线训练的服务器
 servers:
- - id: flyai
-   url: https://www.flyai.com
+  - id: flyai
+    url: https://www.flyai.com

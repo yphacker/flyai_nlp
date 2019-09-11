@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*
+import sys
 
 import os
-import sys
 
 # 训练数据的路径
 DATA_PATH = os.path.join(sys.path[0], 'data', 'input')

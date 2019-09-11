@@ -74,7 +74,7 @@ class BertModel(object):
         with tf.name_scope("loss"):
             # 将label进行onehot转化
             one_hot_labels = tf.one_hot(self.labels, depth=config.num_labels, dtype=tf.float32)
-            # 构建损失函数
+            # # 构建损失函数
             per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
             self.loss = tf.reduce_mean(per_example_loss)
 

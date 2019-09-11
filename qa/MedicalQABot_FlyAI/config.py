@@ -12,4 +12,6 @@ MODEL_PATH = os.path.join(sys.path[0], 'data', 'output', 'model')
 # 训练log的输出路径
 LOG_PATH = os.path.join(sys.path[0], 'data', 'output', 'logs')
 
+print_per_batch = 10
+improvement_step = print_per_batch * 10
 learning_rate = 0.001

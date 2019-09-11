@@ -3,7 +3,7 @@
 import re
 import os
 import json
-from os.path import DATA_PATH
+import config
 
 
 def data_clean(sent):
@@ -25,7 +25,7 @@ def data_clean(sent):
 
 
 def load_dict():
-    dict_path = os.path.join(DATA_PATH, 'words.dict')
+    dict_path = os.path.join(config.DATA_PATH, 'words.dict')
     with open(dict_path, encoding='utf-8') as fin:
         word_dict = json.load(fin)
     return word_dict
@@ -52,5 +52,4 @@ def word2id(sent, word_dict, max_seq_len=33):
 
 
 if __name__ == "__main__":
-
-    exit(1)
+    pass

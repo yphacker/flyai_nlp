@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*
+
 import os
 import tensorflow as tf
 from flyai.model.base import Base
-from path import MODEL_PATH
 from tensorflow.python.saved_model import tag_constants
-from data_helper import *
+import config
 
 TENSORFLOW_MODEL_DIR = "best"
 
@@ -12,7 +12,7 @@ TENSORFLOW_MODEL_DIR = "best"
 class Model(Base):
     def __init__(self, data):
         self.data = data
-        self.model_path = os.path.join(MODEL_PATH, TENSORFLOW_MODEL_DIR)
+        self.model_path = os.path.join(config.MODEL_PATH, TENSORFLOW_MODEL_DIR)
 
     def predict(self, **data):
         '''
@@ -34,7 +34,7 @@ class Model(Base):
 
             feed_dict = {source_input: que_x,
                          source_seq_len: que_len,
-                         target_seq_length: [177]*len(que_len)}
+                         target_seq_length: [177] * len(que_len)}
             predict = session.run(predictions, feed_dict=feed_dict)
 
         return self.data.to_categorys(predict)

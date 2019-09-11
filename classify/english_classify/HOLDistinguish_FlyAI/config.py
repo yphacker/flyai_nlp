@@ -16,7 +16,8 @@ BERT_PATH = os.path.join(sys.path[0], 'bert', )
 print_per_batch = 10
 improvement_step = print_per_batch * 10
 
-max_seq_length = 39
+max_seq_length = 38
 num_labels = 3  # 类别数
-learning_rate = 5e-5
+learning_rate = 1e-5
 grad_clip = 5.0
+max_grad_norm = 5

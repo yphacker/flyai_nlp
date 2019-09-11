@@ -3,10 +3,8 @@
 
 import os
 import json
-import numpy as np
-import pandas as pd
 import jieba
-from path import DATA_PATH
+import config
 
 
 def data_clean(text_line):
@@ -17,8 +15,8 @@ def data_clean(text_line):
 
 
 def load_dict():
-    que_dict_file = os.path.join(DATA_PATH, 'que.dict')
-    ans_dict_file = os.path.join(DATA_PATH, 'ans.dict')
+    que_dict_file = os.path.join(config.DATA_PATH, 'que.dict')
+    ans_dict_file = os.path.join(config.DATA_PATH, 'ans.dict')
     with open(que_dict_file, 'r', encoding='UTF-8') as gf:
         que_dict = json.load(gf)
     with open(ans_dict_file, 'r', encoding='UTF-8') as pf:
@@ -36,6 +34,19 @@ def id2ans(ans_list, ans_dict):
     return tmp_list
 
 
+def ans_process(ans_line, ans_dict):
+    ans_line = jieba.lcut(ans_line)
+    ans_list = list()
+    for i in range(len(ans_line)):
+        if ans_line[i] in ans_dict.keys():
+            ans_list.append(ans_dict[ans_line[i]])
+        else:
+            ans_list.append(ans_dict['_unk_'])
+    ans_list.append(ans_dict['_eos_'])
+    ans_len = len(ans_list)
+    return ans_list, ans_len
+
+
 def que_process(que_line, que_dict, max_que_len=107):
     que_line = jieba.lcut(que_line)
     que_len = len(que_line)
@@ -51,19 +62,6 @@ def que_process(que_line, que_dict, max_que_len=107):
     else:
         que_list = que_list[:max_que_len]
     return que_list, que_len
-
-
-def ans_process(ans_line, ans_dict):
-    ans_line = jieba.lcut(ans_line)
-    ans_list = list()
-    for i in range(len(ans_line)):
-        if ans_line[i] in ans_dict.keys():
-            ans_list.append(ans_dict[ans_line[i]])
-        else:
-            ans_list.append(ans_dict['_unk_'])
-    ans_list.append(ans_dict['_eos_'])
-    ans_len = len(ans_list)
-    return ans_list, ans_len
 
 
 def process_ans_batch(ans_batch, ans_dict, max_ans_len):

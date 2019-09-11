@@ -95,9 +95,9 @@ def train():
             if step - last_improved_step >= config.improvement_step:
                 last_improved_step = step
                 print("No optimization for a long time, auto adjust learning_rate...")
-                learning_rate = learning_rate_decay(learning_rate)
+                # learning_rate = learning_rate_decay(learning_rate)
                 learning_rate_num += 1
-                if learning_rate_num > 5:
+                if learning_rate_num > 3:
                     print("No optimization for a long time, auto-stopping...")
                     flag = False
             if not flag:

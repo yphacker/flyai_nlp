@@ -9,10 +9,6 @@ import config
 from model import Model
 from bert_model import BertModel
 
-TENSORFLOW_MODEL_DIR = "best"
-'''
-项目中的超参
-'''
 parser = argparse.ArgumentParser()
 parser.add_argument("-b", "--BATCH", default=32, type=int, help="batch size")
 parser.add_argument("-e", "--EPOCHS", default=8, type=int, help="train epochs")
@@ -98,9 +94,9 @@ def train():
             if step - last_improved_step >= config.improvement_step:
                 last_improved_step = step
                 print("No optimization for a long time, auto adjust learning_rate...")
-                learning_rate = learning_rate_decay(learning_rate)
+                # learning_rate = learning_rate_decay(learning_rate)
                 learning_rate_num += 1
-                if learning_rate_num > 5:
+                if learning_rate_num > 3:
                     print("No optimization for a long time, auto-stopping...")
                     flag = False
             if not flag:
