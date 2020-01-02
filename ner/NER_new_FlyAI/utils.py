@@ -37,3 +37,24 @@ def load_word2vec_embedding(vocab_size):
     return tf.get_variable("embeddings", dtype=tf.float32,
                            shape=[vocab_size + 2, config.embeddings_size],
                            initializer=tf.constant_initializer(embeddings), trainable=False)
+
+
+def batch_iter(x, y, batch_size=128):
+    '''
+    生成批次数据
+    :param x: 所有验证数据x
+    :param y: 所有验证数据y
+    :param batch_size: 每批的大小
+    :return: 返回分好批次的数据
+    '''
+    data_len = len(x)
+    num_batch = int((data_len - 1) / batch_size) + 1
+
+    indices = np.random.permutation(np.arange(data_len))
+    x_shuffle = x[indices]
+    y_shuffle = y[indices]
+
+    for i in range(num_batch):
+        start_id = i * batch_size
+        end_id = min((i + 1) * batch_size, data_len)
+        yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id]

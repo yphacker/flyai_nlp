@@ -1,6 +1,6 @@
 .DS_Store
 .idea
-.ipynb_checkpoints
 __pycache__
 **/data
-**/MedicalQABot_FlyAI
+**/TextClassification2019_FlyAI
+**/check.py

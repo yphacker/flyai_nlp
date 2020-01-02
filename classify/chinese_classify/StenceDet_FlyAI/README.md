@@ -1,2 +1,1 @@
 # StenceDet_FlyAI
-

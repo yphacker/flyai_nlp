@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*
 import os
-from path import DATA_PATH
+from config import DATA_PATH
 from flyai.processor.base import Base
-import bert.tokenization as tokenization
-from bert.run_classifier import convert_single_example_simple
+# import bert.tokenization as tokenization
+# from bert.run_classifier import convert_single_example_simple
 
 
 class Processor(Base):
@@ -14,14 +14,15 @@ class Processor(Base):
         '''
         参数为csv中作为输入x的一条数据，该方法会被Dataset多次调用
         '''
-        if self.token is None:
-            bert_vocab_file = os.path.join(DATA_PATH, "model", "multi_cased_L-12_H-768_A-12", 'vocab.txt')
-            self.token = tokenization.CharTokenizer(vocab_file=bert_vocab_file)
-
-        word_ids, word_mask, word_segment_ids = \
-            convert_single_example_simple(max_seq_length=256, tokenizer=self.token, text_a=TARGET, text_b=TEXT)
-
-        return word_ids, word_mask, word_segment_ids
+        # if self.token is None:
+        #     bert_vocab_file = os.path.join(DATA_PATH, "model", "multi_cased_L-12_H-768_A-12", 'vocab.txt')
+        #     self.token = tokenization.CharTokenizer(vocab_file=bert_vocab_file)
+        #
+        # word_ids, word_mask, word_segment_ids = \
+        #     convert_single_example_simple(max_seq_length=256, tokenizer=self.token, text_a=TARGET, text_b=TEXT)
+        #
+        # return word_ids, word_mask, word_segment_ids
+        return TARGET, TEXT
 
     def input_y(self, STANCE):
         '''

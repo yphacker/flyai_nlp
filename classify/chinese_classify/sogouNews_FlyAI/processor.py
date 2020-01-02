@@ -10,6 +10,7 @@ import create_dict
 
 MAX_LEN = 50
 
+
 class Processor(Base):
     # 该参数需要与app.yaml的Model的input-->columns->name 一一对应
     def __init__(self):
@@ -27,14 +28,13 @@ class Processor(Base):
         truncate_terms = []
         for term in terms:
             truncate_terms.append(term)
-            if len(truncate_terms)>=MAX_LEN:
+            if len(truncate_terms) >= MAX_LEN:
                 break
         index_list = [self.word_dict[term] if term in self.word_dict
-                       else create_dict._UNK_ for term in truncate_terms ]
-        if len(index_list)<MAX_LEN:
-            index_list = index_list+[create_dict._PAD_]*(MAX_LEN-len(index_list))
+                      else create_dict._UNK_ for term in truncate_terms]
+        if len(index_list) < MAX_LEN:
+            index_list = index_list + [create_dict._PAD_] * (MAX_LEN - len(index_list))
         return index_list
-
 
     # 该参数需要与app.yaml的Model的output-->columns->name 一一对应
     def input_y(self, label):

@@ -1,21 +1,20 @@
-# -*- coding: utf-8 -*
+# coding=utf-8
+# author=yphacker
 
 import os
 import numpy as np
 import tensorflow as tf
 from flyai.model.base import Base
 from config import MODEL_PATH
+from tensorflow.python.saved_model import tag_constants
 
-try:
-    from tensorflow.python.saved_model import tag_constants
-except:
-    from tensorflow.saved_model import tag_constants
 TENSORFLOW_MODEL_DIR = "best"
 
 
 class Model(Base):
     def __init__(self, data):
         self.data = data
+        self.model_path = os.path.join(config.MODEL_PATH, TENSORFLOW_MODEL_DIR)
 
     def predict(self, **data):
         '''
@@ -27,36 +26,48 @@ class Model(Base):
         '''
         with tf.Session() as session:
             tf.saved_model.loader.load(session, [tag_constants.SERVING], os.path.join(MODEL_PATH, TENSORFLOW_MODEL_DIR))
-            input_ids = session.graph.get_tensor_by_name(self.get_tensor_name('input'))
-            output = session.graph.get_tensor_by_name(self.get_tensor_name('output'))
-            transition_params = session.graph.get_tensor_by_name(self.get_tensor_name('transition_params'))
-            x_input_ids = self.data.predict_data(**data)
-            tf_unary_scores, tf_transition_params = session.run([output, transition_params],
-                                                                feed_dict={input_ids: x_input_ids})
-            # 把batch那个维度去掉
-            tf_unary_scores = np.squeeze(tf_unary_scores)
+            # input_ids = session.graph.get_tensor_by_name(self.get_tensor_name('input'))
+            # output = session.graph.get_tensor_by_name(self.get_tensor_name('output'))
+            # transition_params = session.graph.get_tensor_by_name(self.get_tensor_name('transition_params'))
+            # x_input_ids = self.data.predict_data(**data)
+            # tf_unary_scores, tf_transition_params = session.run([output, transition_params],
+            #                                                     feed_dict={input_ids: x_input_ids})
+            # # 把batch那个维度去掉
+            # tf_unary_scores = np.squeeze(tf_unary_scores)
+            # viterbi_sequence, _ = tf.contrib.crf.viterbi_decode(tf_unary_scores, tf_transition_params)
 
-            viterbi_sequence, _ = tf.contrib.crf.viterbi_decode(
-                tf_unary_scores, tf_transition_params)
-            return self.data.to_categorys(viterbi_sequence)
+            input_ids = session.graph.get_tensor_by_name(self.get_tensor_name('input_ids'))
+            input_mask = session.graph.get_tensor_by_name(self.get_tensor_name('input_masks'))
+            segment_ids = session.graph.get_tensor_by_name(self.get_tensor_name('segment_ids'))
+            pred = session.graph.get_tensor_by_name(self.get_tensor_name('predict/pred'))
+            x_input_ids, x_input_mask, x_segment_ids = self.data.predict_data(**data)
+            feed_dict = {input_ids: x_input_ids, input_mask: x_input_mask,segment_ids: x_segment_ids}
+            predict = session.run(pred, feed_dict=feed_dict)
+            return self.data.to_categorys(predict)
 
     def predict_all(self, datas):
         with tf.Session() as session:
             tf.saved_model.loader.load(session, [tag_constants.SERVING], os.path.join(MODEL_PATH, TENSORFLOW_MODEL_DIR))
-            input_ids = session.graph.get_tensor_by_name(self.get_tensor_name('input'))
-            output = session.graph.get_tensor_by_name(self.get_tensor_name('output'))
-            transition_params = session.graph.get_tensor_by_name(self.get_tensor_name('transition_params'))
+            # input_ids = session.graph.get_tensor_by_name(self.get_tensor_name('input'))
+            # output = session.graph.get_tensor_by_name(self.get_tensor_name('output'))
+            # transition_params = session.graph.get_tensor_by_name(self.get_tensor_name('transition_params'))
+            input_ids = session.graph.get_tensor_by_name(self.get_tensor_name('input_ids'))
+            input_mask = session.graph.get_tensor_by_name(self.get_tensor_name('input_masks'))
+            segment_ids = session.graph.get_tensor_by_name(self.get_tensor_name('segment_ids'))
+            pred = session.graph.get_tensor_by_name(self.get_tensor_name('predict/pred'))
             ratings = []
             for data in datas:
-                x_input_ids = self.data.predict_data(**data)
-                tf_unary_scores, tf_transition_params = session.run([output, transition_params],
-                                                                    feed_dict={input_ids: x_input_ids})
-                # 把batch那个维度去掉
-                tf_unary_scores = np.squeeze(tf_unary_scores)
-
-                viterbi_sequence, _ = tf.contrib.crf.viterbi_decode(
-                    tf_unary_scores, tf_transition_params)
-                ratings.append(self.data.to_categorys(viterbi_sequence))
+                # x_input_ids = self.data.predict_data(**data)
+                # tf_unary_scores, tf_transition_params = session.run([output, transition_params],
+                #                                                     feed_dict={input_ids: x_input_ids})
+                # # 把batch那个维度去掉
+                # tf_unary_scores = np.squeeze(tf_unary_scores)
+                #
+                # viterbi_sequence, _ = tf.contrib.crf.viterbi_decode(tf_unary_scores, tf_transition_params)
+                x_input_ids, x_input_mask, x_segment_ids = self.data.predict_data(**data)
+                feed_dict = {input_ids: x_input_ids, input_mask: x_input_mask, segment_ids: x_segment_ids}
+                predict = session.run(pred, feed_dict=feed_dict)
+                ratings.append(self.data.to_categorys(predict))
         return ratings
 
     def save_model(self, session, path, name=TENSORFLOW_MODEL_DIR, overwrite=False):
@@ -74,26 +85,6 @@ class Model(Base):
         builder = tf.saved_model.builder.SavedModelBuilder(os.path.join(path, name))
         builder.add_meta_graph_and_variables(session, [tf.saved_model.tag_constants.SERVING])
         builder.save()
-
-    def batch_iter(self, x, y, batch_size=128):
-        '''
-        生成批次数据
-        :param x: 所有验证数据x
-        :param y: 所有验证数据y
-        :param batch_size: 每批的大小
-        :return: 返回分好批次的数据
-        '''
-        data_len = len(x)
-        num_batch = int((data_len - 1) / batch_size) + 1
-
-        indices = numpy.random.permutation(numpy.arange(data_len))
-        x_shuffle = x[indices]
-        y_shuffle = y[indices]
-
-        for i in range(num_batch):
-            start_id = i * batch_size
-            end_id = min((i + 1) * batch_size, data_len)
-            yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id]
 
     def get_tensor_name(self, name):
         return name + ":0"

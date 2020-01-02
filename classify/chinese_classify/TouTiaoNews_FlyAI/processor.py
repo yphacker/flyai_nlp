@@ -50,7 +50,7 @@ import config
 class Processor(Base):
     def __init__(self):
         self.token = None
-        self.id2lael = ['news_culture', 'news_entertainment', 'news_sports', 'news_finance', 'news_house', 'news_car',
+        self.id2label = ['news_culture', 'news_entertainment', 'news_sports', 'news_finance', 'news_house', 'news_car',
                         'news_edu', 'news_tech', 'news_military', 'news_travel', 'news_world', 'news_agriculture',
                         'news_game', 'stock', 'news_story']
 
@@ -71,10 +71,10 @@ class Processor(Base):
         '''
         参数为csv中作为输入y的一条数据，该方法会被Dataset多次调用
         '''
-        return self.id2lael.index(category.strip('\n'))
+        return self.id2label.index(category.strip('\n'))
 
     def output_y(self, data):
         '''
         验证时使用，把模型输出的y转为对应的结果
         '''
-        return self.id2lael[int(data[0])]
+        return self.id2label[int(data[0])]

@@ -1,16 +1,14 @@
 ---
+# 把样例项目中的配置文件复制过来替换即可
 # 项目的名字
-name: NER
+name: 医疗问答机器人
 # 项目的作者
 author: yphacker
 # 项目的描述
-description: 中文的命名实体识别
-# 项目的主题
-topic: 中文的命名实体识别
-# 项目使用的网络j
-algorithm: LSTM+CRF
+description: 医疗问答机器人
+# 项目使用的网络
+algorithm: LSTM
 language: python3
-virtualenv: flyai_env/bin/
 # 项目使用的框架
 framework: tensorflow
 
@@ -19,8 +17,8 @@ data:
   # 数据集id
   # 该id为上传数据生成的id
   # 通过该id下载可以对应的数据集
-  id: NER_new
-  name: 中文的命名实体识别
+  id: MedicalQABot
+  name: 医疗问答机器人
   category: nlp
 
 # 数据模型
@@ -41,30 +39,24 @@ model:
   # 在processor.py的input_x方法中体现
   input:
     columns:
-      - name: source
+      - name: que_text
         type: string
     # 最终转换的数据类型
-    to_type: ind
-    # 最终转换的数据纬度
+    to_type: int
+    # 最终转换的数据维度
     to_shape:
-
   # 模型用到的输入y字段
   # 在processor.py的input_y方法中体现
   output:
     columns:
-      - name: target
+      - name: ans_text
         type: string
     # 最终转换的数据类型
     to_type: int
-    # 最终转换的数据纬度
+    # 最终转换的数据维度
     to_shape:
-
-# 验证使用的python文件
-evaluate:
-  score: tensorflow_accuracy
 
 # 使用离线训练的服务器
 servers:
-  - id: flyai
-    url: https://flyai.com
-...
+ - id: flyai
+   url: https://www.flyai.com

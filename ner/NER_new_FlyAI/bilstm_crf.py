@@ -1,20 +1,18 @@
 # encoding=utf-8
 
-"""
-bert-blstm-crf layer
-@Author:Macan
-"""
 
 import tensorflow as tf
 from tensorflow.contrib import rnn
 from tensorflow.contrib import crf
+from tensorflow.contrib.layers.python.layers import initializers
+import config
+import bert_model_config as model_config
 
 
 class BiLstmCrf(object):
-    def __init__(self, embedded_chars, hidden_unit, cell_type, num_layers, dropout_rate,
-                 initializers, num_labels, seq_length, labels, lengths, is_training):
+    def __init__(self, embedded_chars, max_seq_length, labels, lengths, is_training):
         """
-        BLSTM-CRF 网络
+        BiLSTM-CRF 网络
         :param embedded_chars: Fine-tuning embedding input
         :param hidden_unit: LSTM的隐含单元个数
         :param cell_type: RNN类型（LSTM OR GRU DICNN will be add in feature）
@@ -22,25 +20,28 @@ class BiLstmCrf(object):
         :param droupout_rate: droupout rate
         :param initializers: variable init class
         :param num_labels: 标签数量
-        :param seq_length: 序列最大长度
+        :param.max_seq_length: 序列最大长度
         :param labels: 真实标签
         :param lengths: [batch_size] 每个batch下序列的真实长度
         :param is_training: 是否是训练过程
         """
-        self.hidden_unit = hidden_unit
-        self.dropout_rate = dropout_rate
-        self.cell_type = cell_type
-        self.num_layers = num_layers
-        self.embedded_chars = embedded_chars
         self.initializers = initializers
-        self.seq_length = seq_length
-        self.num_labels = num_labels
+
+        self.hidden_unit = model_config.hidden_unit
+        self.dropout_rate = model_config.dropout_rate
+        self.cell_type = model_config.cell_type
+        self.num_layers = model_config.num_layers
+
+        self.embedded_chars = embedded_chars
+
+        self.max_seq_length = max_seq_length
+        self.num_labels = config.num_labels
         self.labels = labels
         self.lengths = lengths
         self.embedding_dims = embedded_chars.shape[-1].value
         self.is_training = is_training
 
-    def add_blstm_crf_layer(self, crf_only):
+    def add_blstm_crf_layer(self, crf_only=True):
         """
         blstm-crf网络
         :return:
@@ -60,7 +61,7 @@ class BiLstmCrf(object):
         loss, trans = self.crf_layer(logits)
         # CRF decode, pred_ids 是一条最大概率的标注路径
         pred_ids, _ = crf.crf_decode(potentials=logits, transition_params=trans, sequence_length=self.lengths)
-        return (loss, logits, trans, pred_ids)
+        return loss, logits, trans, pred_ids
 
     def _witch_cell(self):
         """
@@ -97,8 +98,7 @@ class BiLstmCrf(object):
                 cell_fw = rnn.MultiRNNCell([cell_fw] * self.num_layers, state_is_tuple=True)
                 cell_bw = rnn.MultiRNNCell([cell_bw] * self.num_layers, state_is_tuple=True)
 
-            outputs, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw, cell_bw, embedding_chars,
-                                                         dtype=tf.float32)
+            outputs, bi_state = tf.nn.bidirectional_dynamic_rnn(cell_fw, cell_bw, embedding_chars, dtype=tf.float32)
             outputs = tf.concat(outputs, axis=2)
         return outputs
 
@@ -110,7 +110,7 @@ class BiLstmCrf(object):
         """
         with tf.variable_scope("project" if not name else name):
             with tf.variable_scope("hidden"):
-                W = tf.get_variable("W", shape=[self.hidden_unit * 2, self.hidden_unit],
+                W = tf.get_variable("W", shape=[2 * self.hidden_unit, self.hidden_unit],
                                     dtype=tf.float32, initializer=self.initializers.xavier_initializer())
 
                 b = tf.get_variable("b", shape=[self.hidden_unit], dtype=tf.float32,
@@ -127,9 +127,9 @@ class BiLstmCrf(object):
                                     initializer=tf.zeros_initializer())
 
                 pred = tf.nn.xw_plus_b(hidden, W, b)
-            return tf.reshape(pred, [-1, self.seq_length, self.num_labels])
+            return tf.reshape(pred, [-1, self.max_seq_length, self.num_labels])
 
-    def project_crf_layer(self, embedding_chars, name=None):
+    def project_crf_layer(self, name=None):
         """
         hidden layer between input layer and logits
         :param lstm_outputs: [batch_size, num_steps, emb_size]
@@ -145,7 +145,7 @@ class BiLstmCrf(object):
                 output = tf.reshape(self.embedded_chars,
                                     shape=[-1, self.embedding_dims])  # [batch_size, embedding_dims]
                 pred = tf.tanh(tf.nn.xw_plus_b(output, W, b))
-            return tf.reshape(pred, [-1, self.seq_length, self.num_labels])
+            return tf.reshape(pred, [-1, self.max_seq_length, self.num_labels])
 
     def crf_layer(self, logits):
         """
